@@ -1,14 +1,16 @@
 module.exports = {
   packagerConfig: {
     asar: true,
+    icon: "./src/assets/icon", // no file extension required
   },
   rebuildConfig: {},
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
       config: {
-        author: "Shafiul Muslebeen",
+        authors: "Shafiul Muslebeen",
         description: "Peyar Server",
+        setupIcon: "./src/assets/icon.ico",
       },
     },
     {

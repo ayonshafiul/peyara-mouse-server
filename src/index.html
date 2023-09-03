@@ -5,13 +5,26 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
+      content="default-src 'self'; script-src 'self'; connect-src *"
     />
     <title>Peyara Server</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="shortcut icon" href="./assets/icon.ico" type="image/x-icon" />
   </head>
   <body>
-    <canvas id="qr"></canvas>
-    <a href="settings.html">Settings</a>
+    <div class="container">
+      <img
+        src="assets/icon.png"
+        alt="icon"
+        width="128"
+        height="128"
+        class="icon"
+      />
+      <canvas id="qr"></canvas>
+      <div id="toggle-server" class="d-2">Start Server</div>
+      <div id="server-address"></div>
+      <a href="settings.html">Settings</a>
+    </div>
   </body>
   <script src="js/qrious.js"></script>
   <script src="js/script.js"></script>

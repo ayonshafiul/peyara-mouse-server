@@ -1,7 +1,8 @@
 {
   "name": "peyara-server",
+  "productName": "Peyara Remote Mouse Server",
   "version": "1.0.0",
-  "description": "Peyara Server desktop for controlling desktop mouse with android or ios devices",
+  "description": "Peyara Remote Mouse Server for controlling desktop mouse with android or ios devices",
   "main": "src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,6 +25,8 @@
   "dependencies": {
     "@jitsi/robotjs": "^0.6.13",
     "electron-squirrel-startup": "^1.0.0",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "socket.io": "^4.7.2"
   }
 }

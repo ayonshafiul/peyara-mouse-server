@@ -1,10 +1,11 @@
 // preload.js
 
-// All the Node.js APIs are available in the preload process.
-// It has the same sandbox as a Chrome extension.
-window.addEventListener("DOMContentLoaded", () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector);
-    if (element) element.innerText = text;
-  };
+const { ipcRenderer, contextBridge } = require("electron");
+const os = require("os");
+
+contextBridge.exposeInMainWorld("api", {
+  cpuCount: os.cpus().length,
+  toggleServer: () => ipcRenderer.invoke("toggle-server"),
+  isServerOn: () => ipcRenderer.invoke("is-server-on"),
+  getServerAddress: () => ipcRenderer.invoke("get-server-address"),
 });

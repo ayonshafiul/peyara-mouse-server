@@ -2,22 +2,85 @@
 
 // Modules to control application life and create native browser window
 if (require("electron-squirrel-startup")) return;
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 var robot = require("@jitsi/robotjs");
-const express = require("express");
+const expressServer = require("express")();
+const server = require("http").createServer(expressServer);
+const io = require("socket.io")(server);
+const port = 1313;
+let listeningServer = null;
+
+const { networkInterfaces } = require("os");
+
+const nets = networkInterfaces();
+const results = {};
+
+for (const name of Object.keys(nets)) {
+  for (const net of nets[name]) {
+    // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+    // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+    const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
+    if (net.family === familyV4Value && !net.internal) {
+      if (!results[name]) {
+        results[name] = [];
+      }
+      results[name].push(net.address);
+    }
+  }
+}
+
+expressServer.get("/", function (req, res) {
+  res.json("peyara");
+});
+
+io.on("connection", (socket) => {
+  console.log("user connected with socket id" + socket.id);
+  socket.on("disconnect", function () {
+    console.log("user disconnected");
+  });
+});
+
+function toggleServer() {
+  if (!listeningServer) {
+    listeningServer = server.listen(port, function () {
+      console.log(`Listening on port ${port}`);
+    });
+  } else {
+    listeningServer.close(() => {
+      console.log("Server closed");
+    });
+    listeningServer = null;
+  }
+}
+
+ipcMain.handle("toggle-server", toggleServer);
+
+function isServerOn() {
+  return listeningServer != null;
+}
+
+ipcMain.handle("is-server-on", isServerOn);
+
+function getServerAddress() {
+  return results;
+}
+
+ipcMain.handle("get-server-address", getServerAddress);
+
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: __dirname + "/assets/icon.png",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile("src/index.html");
+  mainWindow.loadFile(path.join(__dirname, "index.html"));
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -28,19 +91,6 @@ const createWindow = () => {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   createWindow();
-
-  // Speed up the mouse.
-  robot.setMouseDelay(2);
-
-  var twoPI = Math.PI * 2.0;
-  var screenSize = robot.getScreenSize();
-  var height = screenSize.height / 2 - 10;
-  var width = screenSize.width;
-
-  // for (var x = 0; x < width; x++) {
-  // y = height * Math.sin((twoPI * x) / width) + height;
-  robot.moveMouse(100, 100);
-  // }
   app.on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
