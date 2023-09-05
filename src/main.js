@@ -17,9 +17,11 @@ const nets = networkInterfaces();
 const results = {};
 
 for (const name of Object.keys(nets)) {
+  console.log(name);
   for (const net of nets[name]) {
     // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
     // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
+    console.log(net);
     const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
     if (net.family === familyV4Value && !net.internal) {
       if (!results[name]) {
@@ -33,11 +35,18 @@ for (const name of Object.keys(nets)) {
 expressServer.get("/", function (req, res) {
   res.json("peyara");
 });
-
+robot.setMouseDelay(2);
 io.on("connection", (socket) => {
   console.log("user connected with socket id" + socket.id);
   socket.on("disconnect", function () {
     console.log("user disconnected");
+  });
+  socket.on("coordinates", (coordinates) => {
+    var mouse = robot.getMousePos();
+    robot.moveMouse(mouse.x + coordinates.x, mouse.y + coordinates.y);
+  });
+  socket.on("mouseclick", (state) => {
+    robot.mouseClick(state.finger, state.doubleTap);
   });
 });
 
