@@ -3,13 +3,14 @@
 // Modules to control application life and create native browser window
 if (require("electron-squirrel-startup")) return;
 const { app, BrowserWindow, ipcMain } = require("electron");
+const killable = require("killable");
 const path = require("path");
-var robot = require("@jitsi/robotjs");
+let robot = require("@jitsi/robotjs");
 const expressServer = require("express")();
 const server = require("http").createServer(expressServer);
 const io = require("socket.io")(server);
 const port = 1313;
-let listeningServer = null;
+let serverRunning = false;
 
 const { networkInterfaces } = require("os");
 
@@ -35,6 +36,7 @@ for (const name of Object.keys(nets)) {
 expressServer.get("/", function (req, res) {
   res.json("peyara");
 });
+
 robot.setMouseDelay(2);
 io.on("connection", (socket) => {
   console.log("user connected with socket id" + socket.id);
@@ -64,22 +66,22 @@ io.on("connection", (socket) => {
 });
 
 function toggleServer() {
-  if (!listeningServer) {
-    listeningServer = server.listen(port, function () {
+  if (!serverRunning) {
+    server.listen(port, function () {
+      serverRunning = true;
       console.log(`Listening on port ${port}`);
     });
   } else {
-    listeningServer.close(() => {
-      console.log("Server closed");
+    server.kill(() => {
+      serverRunning = false;
     });
-    listeningServer = null;
   }
 }
-
+killable(server);
 ipcMain.handle("toggle-server", toggleServer);
 
 function isServerOn() {
-  return listeningServer != null;
+  return serverRunning;
 }
 
 ipcMain.handle("is-server-on", isServerOn);
