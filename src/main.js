@@ -45,8 +45,21 @@ io.on("connection", (socket) => {
     var mouse = robot.getMousePos();
     robot.moveMouse(mouse.x + coordinates.x, mouse.y + coordinates.y);
   });
-  socket.on("mouseclick", (state) => {
+  socket.on("clicks", (state) => {
     robot.mouseClick(state.finger, state.doubleTap);
+  });
+  socket.on("scroll", (coordinates) => {
+    robot.scrollMouse(coordinates.x, coordinates.y);
+  });
+  socket.on("windowdragstart", () => {
+    robot.mouseToggle("down");
+  });
+  socket.on("windowdragupdate", (coordinates) => {
+    var mouse = robot.getMousePos();
+    robot.dragMouse(mouse.x + coordinates.x, mouse.y + coordinates.y);
+  });
+  socket.on("windowdragend", () => {
+    robot.mouseToggle("up");
   });
 });
 
