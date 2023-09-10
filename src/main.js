@@ -12,9 +12,10 @@ const io = require("socket.io")(server);
 const port = 1313;
 let serverRunning = false;
 
-const { networkInterfaces } = require("os");
+const { networkInterfaces, hostname } = require("os");
 
 const nets = networkInterfaces();
+const pcName = hostname();
 const results = {};
 
 for (const name of Object.keys(nets)) {
@@ -91,6 +92,12 @@ function getServerAddress() {
 }
 
 ipcMain.handle("get-server-address", getServerAddress);
+
+function getHostName() {
+  return pcName;
+}
+
+ipcMain.handle("get-host-name", getHostName);
 
 const createWindow = () => {
   // Create the browser window.
