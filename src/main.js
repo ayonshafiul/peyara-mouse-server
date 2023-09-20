@@ -2,28 +2,35 @@
 
 // Modules to control application life and create native browser window
 if (require("electron-squirrel-startup")) return;
-const { app, BrowserWindow, ipcMain } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Menu,
+  shell,
+  dialog,
+} = require("electron");
 const killable = require("killable");
 const path = require("path");
 let robot = require("@jitsi/robotjs");
 const expressServer = require("express")();
+const { networkInterfaces, hostname } = require("os");
 const server = require("http").createServer(expressServer);
 const io = require("socket.io")(server);
-const port = 1313;
+
+const isMac = process.platform === "darwin";
 let serverRunning = false;
-
-const { networkInterfaces, hostname } = require("os");
-
 const nets = networkInterfaces();
 const pcName = hostname();
 const results = {};
+const port = 1313;
 
 for (const name of Object.keys(nets)) {
   console.log(name);
   for (const net of nets[name]) {
     // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
     // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-    console.log(net);
+
     const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
     if (net.family === familyV4Value && !net.internal) {
       if (!results[name]) {
@@ -107,21 +114,63 @@ const createWindow = () => {
     icon: __dirname + "/assets/icon.png",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      devTools: !app.isPackaged,
     },
   });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "index.html"));
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+
 app.whenReady().then(() => {
   createWindow();
+  const template = [
+    {
+      label: isMac ? app.name : "File",
+      submenu: [isMac ? { role: "close" } : { role: "quit" }],
+    },
+    {
+      label: "Help",
+      submenu: [
+        {
+          label: "Updates",
+          click: function () {
+            shell.openExternal("https://peyara-remote-mouse.vercel.app");
+          },
+        },
+        {
+          label: "Github Source",
+          click: function () {
+            shell.openExternal(
+              "https://github.com/ayonshafiul/peyara-mouse-server"
+            );
+          },
+        },
+        {
+          label: "About",
+          click: function () {
+            dialog.showMessageBox(
+              null,
+              {
+                title: "About",
+                message: app.name,
+                detail: `Version: ${app.getVersion()}\n Author: Shafiul Muslebeen`,
+                buttons: ["OK"],
+                type: "info",
+              },
+              () => {}
+            );
+          },
+        },
+      ],
+    },
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
   app.on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

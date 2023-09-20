@@ -1,4 +1,4 @@
-## Peyara Mouse Desktop Client
+## Peyara Remote Mouse Desktop Client
 
 A cross platform desktop client for windows/linux/mac os allowing wireless touchpad control from mobile devices
 
