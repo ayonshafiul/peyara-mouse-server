@@ -46,6 +46,7 @@ expressServer.get("/", function (req, res) {
 });
 
 robot.setMouseDelay(2);
+robot.setKeyboardDelay(2);
 io.on("connection", (socket) => {
   console.log("user connected with socket id" + socket.id);
   socket.on("disconnect", function () {
@@ -70,6 +71,31 @@ io.on("connection", (socket) => {
   });
   socket.on("windowdragend", () => {
     robot.mouseToggle("up");
+  });
+  socket.on("key", (key) => {
+    try {
+      if (key.length == 1) {
+        let charCode = key.charCodeAt(0);
+        if (
+          (charCode >= 97 && charCode <= 122) ||
+          (charCode >= 0 && charCode <= 9)
+        ) {
+          robot.keyTap(key);
+        } else {
+          robot.typeString(key);
+        }
+      } else {
+        let lowercasedKey = key.toLowerCase();
+        console.log(lowercasedKey);
+        if (lowercasedKey == "backspace" || lowercasedKey == "enter") {
+          robot.keyTap(lowercasedKey);
+        } else {
+          robot.typeString(key);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
   });
 });
 
