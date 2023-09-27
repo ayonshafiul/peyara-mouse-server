@@ -1,7 +1,8 @@
-let serverElement = document.querySelector("#server-address");
 let hostElement = document.querySelector("#host-name");
 let toggleServerElement = document.querySelector("#toggle-server");
 const PORT = 1313;
+const SERVER_REST_RESPONSE = "peyara";
+const QRCODE_SECRET = "<peyara>";
 
 function generateQr(value) {
   var qr = new QRious({
@@ -11,11 +12,7 @@ function generateQr(value) {
   });
 }
 
-async function setServerUrl(url) {
-  serverElement.innerHTML = url;
-}
-
-async function setHostName(name) {
+function setHostName(name) {
   hostElement.innerHTML = name;
 }
 
@@ -36,23 +33,23 @@ toggleServerElement.addEventListener("click", async () => {
   let hostName = await window.api.getHostName();
   if (isServerOn) {
     let networks = await window.api.getServerAddress();
+    let servers = [QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
     for (const network of Object.keys(networks)) {
       let address = networks[network][0];
       let url = "http://" + address + ":" + PORT + "/";
-      let qrValue = url + "<peyara>" + hostName;
-      if (!network.includes("VMware")) {
-        let result = await fetch(url);
-        let resultJson = await result.json();
-        if (resultJson == "peyara") {
-          generateQr(qrValue);
-          setServerUrl(url);
-          setHostName(hostName);
-        }
+
+      let result = await fetch(url);
+      let resultJson = await result.json();
+      if (resultJson == SERVER_REST_RESPONSE) {
+        // server returned correct response so a possible server address
+        servers.push(url);
       }
     }
+    let qrValue = servers.join(",");
+    generateQr(qrValue);
+    setHostName(hostName);
   } else {
     clearQr();
-    setServerUrl("");
     setHostName("");
   }
   await syncServerStatus();

@@ -23,14 +23,11 @@ let serverRunning = false;
 const nets = networkInterfaces();
 const pcName = hostname();
 const results = {};
-const port = 1313;
+const PORT = 1313;
 
 for (const name of Object.keys(nets)) {
   console.log(name);
   for (const net of nets[name]) {
-    // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
-    // 'IPv4' is in Node <= 17, from 18 it's a number 4 or 6
-
     const familyV4Value = typeof net.family === "string" ? "IPv4" : 4;
     if (net.family === familyV4Value && !net.internal) {
       if (!results[name]) {
@@ -101,9 +98,9 @@ io.on("connection", (socket) => {
 
 function toggleServer() {
   if (!serverRunning) {
-    server.listen(port, function () {
+    server.listen(PORT, function () {
       serverRunning = true;
-      console.log(`Listening on port ${port}`);
+      console.log(`Listening on port ${PORT}`);
     });
   } else {
     server.kill(() => {
