@@ -44,6 +44,17 @@ expressServer.get("/", function (req, res) {
 
 robot.setMouseDelay(2);
 robot.setKeyboardDelay(2);
+const mediaKeys = {
+  audio_mute: "Mute the volume",
+  audio_vol_down: "Lower the volume",
+  audio_vol_up: "Increase the volume",
+  audio_play: "Play",
+  audio_stop: "Stop",
+  audio_pause: "Pause",
+  audio_prev: "Previous Track",
+  audio_next: "Next Track",
+};
+
 io.on("connection", (socket) => {
   console.log("user connected with socket id" + socket.id);
   socket.on("disconnect", function () {
@@ -93,6 +104,9 @@ io.on("connection", (socket) => {
     } catch (e) {
       console.log(e);
     }
+  });
+  socket.on("media-key", (key) => {
+    if (mediaKeys[key]) robot.keyTap(key);
   });
 });
 
