@@ -62,6 +62,3 @@ toggleServerElement.addEventListener("click", async () => {
   syncServerStatus();
   syncInstructions();
 });
-
-syncServerStatus();
-displayQr();
