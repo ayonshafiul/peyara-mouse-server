@@ -12,7 +12,12 @@ body {
   align-items: center;
   flex-direction: column;
   min-height: 100vh;
-  gap: 24px;
+  gap: 8px;
+}
+
+#mobile-instructions {
+  display: none;
+  text-align: center;
 }
 
 .icon {

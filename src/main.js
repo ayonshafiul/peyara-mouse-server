@@ -42,7 +42,7 @@ expressServer.get("/", function (req, res) {
   res.json("peyara");
 });
 
-robot.setMouseDelay(2);
+robot.setMouseDelay(1);
 robot.setKeyboardDelay(2);
 const mediaKeys = {
   audio_mute: "Mute the volume",
@@ -147,13 +147,17 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 900,
     title: app.name,
     icon: __dirname + "/assets/icon.png",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       devTools: !app.isPackaged,
     },
+  });
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    event.preventDefault();
+    shell.openExternal(url);
   });
 
   // and load the index.html of the app.

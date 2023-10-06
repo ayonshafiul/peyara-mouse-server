@@ -1,5 +1,7 @@
 let hostElement = document.querySelector("#host-name");
 let toggleServerElement = document.querySelector("#toggle-server");
+let mobileInstructionsElement = document.querySelector("#mobile-instructions");
+
 const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
 const QRCODE_SECRET = "<peyara>";
@@ -19,6 +21,11 @@ function setHostName(name) {
 async function syncServerStatus() {
   let isServerOn = await window.api.isServerOn();
   toggleServerElement.innerHTML = isServerOn ? "Stop Server" : "Start Server";
+}
+
+async function syncInstructions() {
+  let isServerOn = await window.api.isServerOn();
+  mobileInstructionsElement.style.display = isServerOn ? "block" : "none";
 }
 
 function clearQr() {
@@ -52,7 +59,8 @@ toggleServerElement.addEventListener("click", async () => {
     clearQr();
     setHostName("");
   }
-  await syncServerStatus();
+  syncServerStatus();
+  syncInstructions();
 });
 
 syncServerStatus();
