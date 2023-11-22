@@ -9,6 +9,7 @@ const {
   Menu,
   shell,
   dialog,
+  desktopCapturer,
 } = require("electron");
 const killable = require("killable");
 const path = require("path");
@@ -152,12 +153,22 @@ const createWindow = () => {
     icon: __dirname + "/assets/icon.png",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      devTools: !app.isPackaged,
+      devTools: true,
     },
   });
   mainWindow.webContents.on("will-navigate", (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
+  });
+  mainWindow.webContents.openDevTools();
+  desktopCapturer.getSources({ types: ["screen"] }).then(async (sources) => {
+    for (const source of sources) {
+      console.log(source.name);
+      if (source.name.includes("Screen")) {
+        mainWindow.webContents.send("SET_SOURCE_ID", source.id);
+        return;
+      }
+    }
   });
 
   // and load the index.html of the app.
@@ -213,6 +224,7 @@ app.whenReady().then(() => {
   ];
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+
   app.on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.

@@ -1,6 +1,7 @@
 let hostElement = document.querySelector("#host-name");
 let toggleServerElement = document.querySelector("#toggle-server");
 let mobileInstructionsElement = document.querySelector("#mobile-instructions");
+let videoElement = document.querySelector("#screen");
 
 const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
@@ -61,4 +62,23 @@ toggleServerElement.addEventListener("click", async () => {
   }
   syncServerStatus();
   syncInstructions();
+  let screenId = await window.api.getScreenId();
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        mandatory: {
+          chromeMediaSource: "desktop",
+          chromeMediaSourceId: screenId,
+          minWidth: 1280,
+          maxWidth: 1280,
+          minHeight: 720,
+          maxHeight: 720,
+        },
+      },
+    });
+    videoElement.srcObject = stream;
+  } catch (e) {
+    console.log(e);
+  }
 });
