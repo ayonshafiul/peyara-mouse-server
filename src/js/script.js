@@ -2,6 +2,9 @@ let hostElement = document.querySelector("#host-name");
 let toggleServerElement = document.querySelector("#toggle-server");
 let mobileInstructionsElement = document.querySelector("#mobile-instructions");
 let videoElement = document.querySelector("#screen");
+let cameraElement = document.querySelector("#camera");
+let peerElement = document.querySelector("#start-peer");
+let peerConnection;
 
 const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
@@ -62,6 +65,28 @@ toggleServerElement.addEventListener("click", async () => {
   }
   syncServerStatus();
   syncInstructions();
+});
+
+var socket = io("http://localhost:1313");
+console.log(io);
+socket.on("connect", function () {
+  console.log("Socket Connected");
+});
+socket.on("answer", function (answer) {
+  console.log("answer recieved on client", JSON.stringify(answer));
+  peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+});
+socket.on("recieve-answer-ice-candidate", async function (iceCandidate) {
+  console.log("Answer ice candidate on pc", iceCandidate);
+  if (iceCandidate) {
+    await peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
+  }
+});
+socket.on("disconnect", function () {});
+
+async function startPeer() {
+  peerConnection = new RTCPeerConnection();
+
   let screenId = await window.api.getScreenId();
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -78,7 +103,62 @@ toggleServerElement.addEventListener("click", async () => {
       },
     });
     videoElement.srcObject = stream;
+
+    let localStream = stream;
+    console.log(stream, "stream");
+    console.log(localStream.getTracks(), "tracks");
+    for (let track of localStream.getTracks()) {
+      await peerConnection.addTrack(track, localStream);
+    }
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    socket.emit("offer", offer);
+    peerConnection.addEventListener(
+      "connectionstatechange",
+      (event) => {
+        switch (peerConnection.connectionState) {
+          case "new":
+          case "connecting":
+            console.log("Connecting…");
+            break;
+          case "connected":
+            console.log("Online");
+
+            break;
+          case "disconnected":
+            console.log("Disconnecting…");
+            break;
+          case "closed":
+            console.log("Offline");
+            break;
+          case "failed":
+            console.log("Error");
+            break;
+          default:
+            console.log("Unknown");
+            break;
+        }
+      },
+      false
+    );
+    peerConnection.addEventListener("icecandidate", (event) => {
+      console.log("Emitting ice candidate from pc", event.candidate);
+
+      socket.emit("offer-ice-candidate", event.candidate);
+    });
+    peerConnection.addEventListener("iceconnectionstatechange", (event) => {
+      console.log("Ice connection state change", event);
+    });
+    peerConnection.ontrack = (event) => {
+      console.log("recieved tracks", event);
+      // event.streams contains a MediaStream with the received track
+      const [stream] = event.streams;
+
+      // Assuming you have a video element in your component
+      cameraElement.srcObject = stream;
+    };
   } catch (e) {
     console.log(e);
   }
-});
+}
+startPeer();

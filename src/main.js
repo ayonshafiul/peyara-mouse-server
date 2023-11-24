@@ -25,6 +25,8 @@ const nets = networkInterfaces();
 const pcName = hostname();
 const results = {};
 const PORT = 1313;
+let offerServer = null;
+let answerServer = null;
 
 for (const name of Object.keys(nets)) {
   console.log(name);
@@ -58,12 +60,33 @@ const mediaKeys = {
 
 io.on("connection", (socket) => {
   console.log("user connected with socket id" + socket.id);
+  const ipAddress = socket.handshake.address;
+  console.log(`New connection from IP address: ${ipAddress}`);
+  if (offerServer) {
+    io.emit("offer", offerServer);
+  }
   socket.on("disconnect", function () {
     console.log("user disconnected");
   });
   socket.on("coordinates", (coordinates) => {
     var mouse = robot.getMousePos();
     robot.moveMouse(mouse.x + coordinates.x, mouse.y + coordinates.y);
+  });
+  socket.on("offer", (offer) => {
+    console.log("Offer recieved on server" + JSON.stringify(offer));
+    offerServer = offer;
+  });
+  socket.on("offer-ice-candidate", (iceCandidate) => {
+    console.log("offer Ice candidate recieved on server", iceCandidate);
+    socket.broadcast.emit("recieve-offer-ice-candidate", iceCandidate);
+  });
+  socket.on("answer-ice-candidate", (iceCandidate) => {
+    console.log("answer Ice candidate recieved on server", iceCandidate);
+    socket.broadcast.emit("recieve-answer-ice-candidate", iceCandidate);
+  });
+  socket.on("answer", (answer) => {
+    console.log("Answer recieved on server" + JSON.stringify(answer));
+    socket.broadcast.emit("answer", answer);
   });
   socket.on("clicks", (state) => {
     robot.mouseClick(state.finger, state.doubleTap);
@@ -112,17 +135,21 @@ io.on("connection", (socket) => {
 });
 
 function toggleServer() {
-  if (!serverRunning) {
-    server.listen(PORT, function () {
-      serverRunning = true;
-      console.log(`Listening on port ${PORT}`);
-    });
-  } else {
-    server.kill(() => {
-      serverRunning = false;
-    });
-  }
+  // if (!serverRunning) {
+  //   server.listen(PORT, function () {
+  //     serverRunning = true;
+  //     console.log(`Listening on port ${PORT}`);
+  //   });
+  // } else {
+  //   server.kill(() => {
+  //     serverRunning = false;
+  //   });
+  // }
 }
+server.listen(PORT, function () {
+  serverRunning = true;
+  console.log(`Listening on port ${PORT}`);
+});
 killable(server);
 ipcMain.handle("toggle-server", toggleServer);
 
@@ -161,15 +188,18 @@ const createWindow = () => {
     shell.openExternal(url);
   });
   mainWindow.webContents.openDevTools();
-  desktopCapturer.getSources({ types: ["screen"] }).then(async (sources) => {
-    for (const source of sources) {
-      console.log(source.name);
-      if (source.name.includes("Screen")) {
-        mainWindow.webContents.send("SET_SOURCE_ID", source.id);
-        return;
+  desktopCapturer
+    .getSources({ types: ["screen", "audio"] })
+    .then(async (sources) => {
+      console.log(sources);
+      for (const source of sources) {
+        console.log(source.name);
+        if (source.name.includes("Screen")) {
+          mainWindow.webContents.send("SET_SOURCE_ID", source.id);
+          return;
+        }
       }
-    }
-  });
+    });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "index.html"));
