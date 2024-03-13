@@ -4,6 +4,7 @@ body {
   margin: 0;
   font-family: monospace;
   font-size: large;
+  background-image: url("../assets/bg.png");
 }
 
 .container {
@@ -25,59 +26,19 @@ body {
 }
 
 .d-2 {
-  --b: 4px; /* border length*/
-  --c: 4px; /* the cube perspective */
-
-  --g: calc(var(--c) * 0.707); /* 0.707 = cos(45deg) = sin(45deg) */
-
-  padding: 8px;
-  color: green;
-  transition: 0.5s;
-  border: solid transparent;
+  background-color: #ffeb3b;
+  color: black;
+  padding: 16px;
+  border-radius: 8px;
   cursor: pointer;
-  border-width: var(--b) calc(var(--c) + var(--b)) calc(var(--c) + var(--b))
-    var(--b);
-  background: linear-gradient(
-        45deg,
-        transparent var(--g),
-        rgba(255, 255, 255, 0.6) 0
-      )
-      right / var(--c) 100%,
-    linear-gradient(-135deg, transparent var(--g), rgba(255, 255, 255, 0.3) 0)
-      bottom / 100% var(--c),
-    conic-gradient(
-      from -180deg at top var(--b) left var(--b),
-      currentColor 270deg,
-      transparent 0
-    ),
-    conic-gradient(
-      from 0deg at bottom calc(var(--c) + var(--b)) right
-        calc(var(--c) + var(--b)),
-      currentColor 270deg,
-      transparent 0
-    );
-  background-repeat: no-repeat;
-  background-origin: border-box;
-  transform: translate(calc(var(--c) / 1), calc(var(--c) / 1));
-  clip-path: polygon(
-    calc(100% - var(--c)) 0%,
-    calc(100% - var(--c)) 0%,
-    0% 0%,
-    0% calc(100% - var(--c)),
-    0% calc(100% - var(--c)),
-    calc(100% - var(--c)) calc(100% - var(--c)),
-    calc(100% - var(--c)) calc(100% - var(--c))
-  );
+  border: 2px solid #1f1f1f;
 }
 .d-2:hover {
-  transform: translate(0, 0);
-  clip-path: polygon(
-    100% var(--c),
-    calc(100% - var(--c)) 0%,
-    0% 0%,
-    0% calc(100% - var(--c)),
-    var(--c) 100%,
-    100% 100%,
-    100% 100%
-  );
+  background-color: #1f1f1f;
+  color: #ffeb3b;
+  border: 2px solid #ffeb3b;
+}
+
+#host-name {
+  margin: 16;
 }

@@ -53,6 +53,10 @@ const mediaKeys = {
   audio_pause: "Pause",
   audio_prev: "Previous Track",
   audio_next: "Next Track",
+  up: "Up",
+  down: "Down",
+  left: "Left",
+  right: "Right",
 };
 
 io.on("connection", (socket) => {
