@@ -9,26 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  create_release:
-    runs-on: ubuntu-20.04
-    if: github.ref_type == 'tag'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
-
   build:
-    needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
