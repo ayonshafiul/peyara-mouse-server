@@ -52,5 +52,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: out/make/*.deb
-          asset_name: Electron-${{ matrix.os }}-Build.deb
+          asset_name: Peyara-${{ matrix.os }}-Build.deb
           asset_content_type: application/vnd.debian.binary-package
