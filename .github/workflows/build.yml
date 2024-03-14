@@ -31,7 +31,7 @@ jobs:
           node-version: "16"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --silent
 
       - name: Build Electron application
         run: npm run distribute
