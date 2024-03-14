@@ -42,8 +42,7 @@ jobs:
         with:
           title: Release${{ github.run_number }}
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Electron-${{ matrix.os }}-Build
-          path: out/make/*
+      - name: Release
+          uses: softprops/action-gh-release@v2
+          with:
+            files: out/make/*
