@@ -43,9 +43,17 @@ jobs:
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
+      - name: Upload Release Asset
+        id: upload-release-asset
+        run: ls
 
       - name: Upload Release Asset
         id: upload-release-asset
+        run: ls out/
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        run: ls
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
