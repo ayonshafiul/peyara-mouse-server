@@ -24,8 +24,11 @@ module.exports = {
       name: "@electron-forge/maker-deb",
       config: {
         options: {
-          bin: "Peyara Remote Mouse Server",
+          bin: "PeyaraRemoteMouseServer",
           icon: "./src/assets/icon.png",
+        },
+        packagerConfig: {
+          executableName: "peyara-server",
         },
       },
     },

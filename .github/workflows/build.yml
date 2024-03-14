@@ -16,10 +16,10 @@ jobs:
         include:
           # - os: ubuntu-20.04
           #   ext: .deb
-          - os: windows-2019
-            ext: .exe
-          # - os: macos-13
-          #   ext: .zip
+          # - os: windows-2019
+          #   ext: .exe
+          - os: macos-12
+            ext: .zip
 
     steps:
       - name: Checkout code
