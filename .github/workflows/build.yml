@@ -43,6 +43,6 @@ jobs:
           title: Release${{ github.run_number }}
 
       - name: Release
-          uses: softprops/action-gh-release@v2
-          with:
-            files: out/make/*
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/make/*
