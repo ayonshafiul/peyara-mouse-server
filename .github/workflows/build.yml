@@ -33,24 +33,16 @@ jobs:
       - name: Build Electron application
         run: npm run distribute
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ github.run_number }}
-          release_name: Release ${{ github.run_number }}
-          draft: false
-          prerelease: false
+      - name: Create a Release
+        uses: elgohr/Github-Release-Action@v5
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: out/make/*
-          asset_name: Peyara-${{ matrix.os }}-Build.zip
-          asset_content_type: application/zip
+          title: Release${{ github.run_number }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/make/*
