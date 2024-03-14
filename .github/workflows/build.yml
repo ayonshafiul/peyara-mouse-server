@@ -11,10 +11,15 @@ permissions:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        include:
+          - os: ubuntu-20.04
+            ext: .deb
+          - os: windows-latest
+            ext: .exe
+          - os: macos-latest
+            ext: .zip
 
     steps:
       - name: Checkout code
@@ -52,7 +57,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: out/make/**/*.deb
+          file: out/make/**/*${{ matrix.ext }}
           tag: ${{ github.ref }}
           overwrite: true
-          body: "This is my release text"
+          body: "Release for Peyara Mouse"
