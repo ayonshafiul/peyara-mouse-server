@@ -33,6 +33,8 @@ jobs:
 
       - name: Create a Release
         uses: elgohr/Github-Release-Action@v5
+        permissions:
+          contents: write
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           GH_TOKEN: ${{ github.token }}
