@@ -43,12 +43,10 @@ jobs:
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: show files
         run: ls
 
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: show files out
         run: ls out/
 
       - name: Upload Release Asset
