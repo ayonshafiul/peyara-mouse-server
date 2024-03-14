@@ -41,7 +41,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         with:
           title: Release${{ github.run_number }}
-
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
