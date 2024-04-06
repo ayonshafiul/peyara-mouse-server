@@ -33,14 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm install --silent
 
+      - name: check for windows version
+        if: matrix.os == 'windows-2019'
+        run: npm install @jitsi/robotjs@0.6.13
+
       - name: Build Electron application
         run: npm run distribute
-
-      - name: show files
-        run: ls
-
-      - name: show files out
-        run: ls out/
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
