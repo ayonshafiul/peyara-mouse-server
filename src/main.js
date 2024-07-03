@@ -9,6 +9,8 @@ const {
   Menu,
   shell,
   dialog,
+  ipcRenderer,
+  clipboard,
 } = require("electron");
 const killable = require("killable");
 const path = require("path");
@@ -24,6 +26,7 @@ const nets = networkInterfaces();
 const pcName = hostname();
 const results = {};
 const PORT = 1313;
+let mainWindow;
 
 for (const name of Object.keys(nets)) {
   console.log(name);
@@ -112,6 +115,9 @@ io.on("connection", (socket) => {
   socket.on("media-key", (key) => {
     if (mediaKeys[key]) robot.keyTap(key);
   });
+  socket.on("text", (text) => {
+    mainWindow.webContents.send("recieve-text", text);
+  });
 });
 
 function toggleServer() {
@@ -147,9 +153,23 @@ function getHostName() {
 
 ipcMain.handle("get-host-name", getHostName);
 
+async function sendText(_event, text) {
+  io?.emit("text-mobile", text);
+}
+
+ipcMain.handle("send-text", sendText);
+
+async function copyText(_event, text) {
+  if (text) {
+    clipboard.writeText(text);
+  }
+}
+
+ipcMain.handle("copy-text", copyText);
+
 const createWindow = () => {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 900,
     title: app.name,
@@ -159,6 +179,7 @@ const createWindow = () => {
       devTools: !app.isPackaged,
     },
   });
+  mainWindow.webContents.openDevTools();
   mainWindow.webContents.on("will-navigate", (event, url) => {
     event.preventDefault();
     shell.openExternal(url);

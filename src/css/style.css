@@ -31,7 +31,8 @@ body {
   padding: 16px;
   border-radius: 8px;
   cursor: pointer;
-  border: 2px solid #1f1f1f;
+  border-left: 2px solid #1f1f1f;
+  border-bottom: 2px solid #1f1f1f;
 }
 .d-2:hover {
   background-color: #1f1f1f;
@@ -41,4 +42,17 @@ body {
 
 #host-name {
   margin: 16;
+}
+
+#text-input {
+  width: 500px;
+  height: 200px;
+  text-align: top;
+  margin-bottom: 8px;
+}
+
+#copy {
+  text-align: right;
+  cursor: pointer;
+  margin-bottom: 8px;
 }

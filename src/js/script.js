@@ -1,6 +1,9 @@
 let hostElement = document.querySelector("#host-name");
 let toggleServerElement = document.querySelector("#toggle-server");
 let mobileInstructionsElement = document.querySelector("#mobile-instructions");
+let textInputElement = document.querySelector("#text-input");
+let textSendElement = document.querySelector("#text-send");
+let copyElement = document.querySelector("#copy");
 
 const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
@@ -13,6 +16,10 @@ function generateQr(value) {
     size: 200,
   });
 }
+
+window.api.onRecieveText((text) => {
+  textInputElement.value = text;
+});
 
 function setHostName(name) {
   hostElement.innerHTML = name;
@@ -61,4 +68,17 @@ toggleServerElement.addEventListener("click", async () => {
   }
   syncServerStatus();
   syncInstructions();
+});
+
+textSendElement.addEventListener("click", async () => {
+  await window.api.sendText(textInputElement.value);
+  textInputElement.value = "";
+});
+
+copyElement.addEventListener("click", async () => {
+  await window.api.copyText(textInputElement.value);
+  copyElement.innerHTML = "Copied!";
+  setTimeout(() => {
+    copyElement.innerHTML = "Copy to clipboard";
+  }, 1000);
 });
