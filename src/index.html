@@ -5,7 +5,7 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; connect-src *"
+      content="default-src 'self' localhost:* ws://localhost:*; script-src 'self' http://localhost:* ws://localhost:*; connect-src *"
     />
     <title>Peyara Server</title>
     <link rel="stylesheet" href="css/style.css" />
@@ -32,6 +32,7 @@
         <div id="copy">Copy to clipboard</div>
         <div id="text-send" class="d-2">Send to mobile</div>
       </div>
+      <div id="share-screen" class="d-2">Share Screen</div>
       <div id="mobile-instructions">
         <div>
           <p>Download the client</p>
@@ -44,6 +45,7 @@
       </div>
     </div>
   </body>
+  <script src="http://localhost:1313/socket.io/socket.io.js"></script>
   <script src="js/qrious.js"></script>
   <script src="js/script.js"></script>
 </html>

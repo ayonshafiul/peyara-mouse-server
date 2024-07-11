@@ -11,6 +11,7 @@ const {
   dialog,
   ipcRenderer,
   clipboard,
+  desktopCapturer,
 } = require("electron");
 const killable = require("killable");
 const path = require("path");
@@ -27,6 +28,7 @@ const pcName = hostname();
 const results = {};
 const PORT = 1313;
 let mainWindow;
+let offerServer;
 
 for (const name of Object.keys(nets)) {
   console.log(name);
@@ -118,20 +120,49 @@ io.on("connection", (socket) => {
   socket.on("text", (text) => {
     mainWindow.webContents.send("recieve-text", text);
   });
+
+  // webrtc socket handlers
+  // if (offerServer) {
+  //   console.log("emitting offer server from pc", offerServer);
+  //   io.emit("offer", offerServer);
+  // }
+  socket.on("offer", (offer) => {
+    console.log("Offer recieved on server" + JSON.stringify(offer));
+    if (offer) {
+      offerServer = offer;
+      socket.broadcast.emit("offer", offer);
+    }
+  });
+  socket.on("offer-ice-candidate", (iceCandidate) => {
+    console.log("offer Ice candidate recieved on server", iceCandidate);
+    socket.broadcast.emit("recieve-offer-ice-candidate", iceCandidate);
+  });
+  socket.on("answer-ice-candidate", (iceCandidate) => {
+    console.log("answer Ice candidate recieved on server", iceCandidate);
+    socket.broadcast.emit("recieve-answer-ice-candidate", iceCandidate);
+  });
+  socket.on("answer", (answer) => {
+    console.log("Answer recieved on server" + JSON.stringify(answer));
+    socket.broadcast.emit("answer", answer);
+  });
 });
 
 function toggleServer() {
-  if (!serverRunning) {
-    server.listen(PORT, function () {
-      serverRunning = true;
-      console.log(`Listening on port ${PORT}`);
-    });
-  } else {
-    server.kill(() => {
-      serverRunning = false;
-    });
-  }
+  // if (!serverRunning) {
+  //   server.listen(PORT, function () {
+  //     serverRunning = true;
+  //     console.log(`Listening on port ${PORT}`);
+  //   });
+  // } else {
+  //   server.kill(() => {
+  //     serverRunning = false;
+  //   });
+  // }
 }
+server.listen(PORT, function () {
+  serverRunning = true;
+  console.log(`Listening on port ${PORT}`);
+});
 killable(server);
 ipcMain.handle("toggle-server", toggleServer);
 
@@ -179,10 +210,23 @@ const createWindow = () => {
       devTools: !app.isPackaged,
     },
   });
+  mainWindow.webContents.openDevTools();
   mainWindow.webContents.on("will-navigate", (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
   });
+  desktopCapturer
+    .getSources({ types: ["screen", "audio"] })
+    .then(async (sources) => {
+      console.log(sources);
+      for (const source of sources) {
+        console.log(source.name);
+        if (source.name.includes("Screen")) {
+          mainWindow.webContents.send("SET_SOURCE_ID", source.id);
+          return;
+        }
+      }
+    });
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "index.html"));
