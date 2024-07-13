@@ -1,6 +1,4 @@
 let hostElement = document.querySelector("#host-name");
-let toggleServerElement = document.querySelector("#toggle-server");
-let mobileInstructionsElement = document.querySelector("#mobile-instructions");
 let textInputElement = document.querySelector("#text-input");
 let textSendElement = document.querySelector("#text-send");
 let copyElement = document.querySelector("#copy");
@@ -10,6 +8,7 @@ const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
 const QRCODE_SECRET = "<peyara>";
 let peerConnection;
+let peerConnectionStatus = "";
 
 function generateQr(value) {
   var qr = new QRious({
@@ -27,51 +26,6 @@ function setHostName(name) {
   hostElement.innerHTML = name;
 }
 
-async function syncServerStatus() {
-  let isServerOn = await window.api.isServerOn();
-  toggleServerElement.innerHTML = isServerOn ? "Stop Server" : "Start Server";
-}
-
-async function syncInstructions() {
-  let isServerOn = await window.api.isServerOn();
-  mobileInstructionsElement.style.display = isServerOn ? "block" : "none";
-}
-
-function clearQr() {
-  let canvas = document.getElementById("qr");
-  const context = canvas.getContext("2d");
-  context.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-toggleServerElement.addEventListener("click", async () => {
-  await window.api.toggleServer();
-  let isServerOn = await window.api.isServerOn();
-  let hostName = await window.api.getHostName();
-  if (isServerOn) {
-    let networks = await window.api.getServerAddress();
-    let servers = [QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
-    for (const network of Object.keys(networks)) {
-      let address = networks[network][0];
-      let url = "http://" + address + ":" + PORT + "/";
-
-      let result = await fetch(url);
-      let resultJson = await result.json();
-      if (resultJson == SERVER_REST_RESPONSE) {
-        // server returned correct response so a possible server address
-        servers.push(url);
-      }
-    }
-    let qrValue = servers.join(",");
-    generateQr(qrValue);
-    setHostName(hostName);
-  } else {
-    clearQr();
-    setHostName("");
-  }
-  syncServerStatus();
-  syncInstructions();
-});
-
 textSendElement.addEventListener("click", async () => {
   await window.api.sendText(textInputElement.value);
   textInputElement.value = "";
@@ -85,19 +39,16 @@ copyElement.addEventListener("click", async () => {
   }, 1000);
 });
 
-var socket = io("http://localhost:1313");
-console.log(io);
+var socket = io(`http://localhost:${PORT}`);
 socket.on("connect", function () {
   console.log("Socket Connected");
 });
 socket.on("answer", function (answer) {
-  console.log("answer recieved on client", JSON.stringify(answer));
   if (answer) {
     peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
   }
 });
 socket.on("recieve-answer-ice-candidate", async function (iceCandidate) {
-  console.log("Answer ice candidate on pc", iceCandidate);
   if (iceCandidate) {
     await peerConnection.addIceCandidate(new RTCIceCandidate(iceCandidate));
   }
@@ -113,11 +64,6 @@ async function startPeer() {
   console.log(screenId, "screenId");
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        mandatory: {
-          chromeMediaSource: "desktop",
-        },
-      },
       video: {
         mandatory: {
           chromeMediaSource: "desktop",
@@ -130,16 +76,17 @@ async function startPeer() {
       },
     });
 
-    console.log(stream.getTracks(), "tracks");
     for (let track of stream.getTracks()) {
       await peerConnection.addTrack(track, stream);
     }
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-    socket.emit("offer", offer);
+    socket.emit("offer", offer); // initiate the webrtc call
     peerConnection.addEventListener(
       "connectionstatechange",
       (event) => {
+        console.log("peer", peerConnection.connectionState);
+        peerConnectionStatus = peerConnection.connectionState;
         switch (peerConnection.connectionState) {
           case "new":
           case "connecting":
@@ -147,16 +94,11 @@ async function startPeer() {
             break;
           case "connected":
             console.log("Online");
-
+            shareScreenElement.innerHTML = "Stop Screen Sharing.";
             break;
-          case "disconnected":
+          case "disconnected" || "closed" || "failed":
             console.log("Disconnecting…");
-            break;
-          case "closed":
-            console.log("Offline");
-            break;
-          case "failed":
-            console.log("Error");
+            shareScreenElement.innerHTML = "Share Screen";
             break;
           default:
             console.log("Unknown");
@@ -180,7 +122,45 @@ async function startPeer() {
     console.log(e);
   }
 }
-shareScreenElement.addEventListener("click", () => {
-  console.log("Sharing screen");
-  startPeer();
+
+async function stopPeer() {
+  peerConnection?.close();
+  peerConnectionStatus = "disconnected";
+  shareScreenElement.innerHTML = "Share Screen";
+}
+shareScreenElement.addEventListener("click", async () => {
+  const socketsList = await window.api.getSocketsList();
+  console.log(socketsList, peerConnectionStatus);
+  if (socketsList.length > 1 && peerConnectionStatus !== "connected") {
+    startPeer();
+  } else {
+    if (peerConnectionStatus === "connected") {
+      stopPeer();
+    } else {
+      alert("No clients connected yet to share screen with.");
+    }
+  }
 });
+
+async function initServer() {
+  let hostName = await window.api.getHostName();
+  let networks = await window.api.getServerAddress();
+  let servers = [QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
+  for (const network of Object.keys(networks)) {
+    let address = networks[network][0];
+    let url = "http://" + address + ":" + PORT + "/";
+
+    let result = await fetch(url);
+    let resultJson = await result.json();
+    if (resultJson == SERVER_REST_RESPONSE) {
+      // server returned correct response so a possible server address
+      servers.push(url);
+    }
+  }
+  let qrValue = servers.join(",");
+  generateQr(qrValue);
+  setHostName(hostName);
+}
+
+// Start Server on app
+initServer();
