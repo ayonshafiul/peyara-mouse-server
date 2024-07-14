@@ -127,6 +127,10 @@ io.on("connection", (socket) => {
     mainWindow.webContents.send("recieve-text", text);
   });
 
+  socket.on("stop-screen-share", () => {
+    socket.broadcast.emit("stop-screen-share");
+  });
+
   // handlers for webrtc connection establisment
   socket.on("offer", (offer) => {
     if (offer) {

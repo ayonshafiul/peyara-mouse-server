@@ -135,6 +135,7 @@ shareScreenElement.addEventListener("click", async () => {
     startPeer();
   } else {
     if (peerConnectionStatus === "connected") {
+      socket.emit("stop-screen-share");
       stopPeer();
     } else {
       alert("No clients connected yet to share screen with.");
