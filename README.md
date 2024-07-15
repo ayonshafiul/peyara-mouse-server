@@ -4,6 +4,7 @@ A cross platform desktop client for windows/linux/mac os allowing wireless touch
 
 <img src="https://peyara-remote-mouse.vercel.app/img/run-server.png">
 
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/ayonshafiul/peyara-mouse-server/latest/total)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/ayonshafiul/peyara-mouse-server/total)
 ![App Version](https://img.shields.io/github/package-json/v/ayonshafiul/peyara-mouse-server/main?label=Version)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ayonshafiul/peyara-mouse-server)
