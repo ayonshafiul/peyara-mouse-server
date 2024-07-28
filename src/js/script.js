@@ -146,7 +146,8 @@ shareScreenElement.addEventListener("click", async () => {
 async function initServer() {
   let hostName = await window.api.getHostName();
   let networks = await window.api.getServerAddress();
-  let servers = [QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
+  let appVersion = await window.api.getAppVersion();
+  let servers = [appVersion, QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
   for (const network of Object.keys(networks)) {
     let address = networks[network][0];
     let url = "http://" + address + ":" + PORT + "/";

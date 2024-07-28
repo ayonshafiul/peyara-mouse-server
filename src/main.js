@@ -123,6 +123,14 @@ io.on("connection", (socket) => {
   socket.on("media-key", (key) => {
     if (mediaKeys[key]) robot.keyTap(key);
   });
+
+  socket.on("edit-key", (payload) => {
+    try {
+      robot.keyTap(payload.key, payload.modifier);
+    } catch (e) {
+      console.log(e);
+    }
+  });
   socket.on("text", (text) => {
     mainWindow.webContents.send("recieve-text", text);
   });
@@ -165,6 +173,11 @@ function getServerAddress() {
 }
 
 ipcMain.handle("get-server-address", getServerAddress);
+
+function getAppVersion() {
+  return app.getVersion();
+}
+ipcMain.handle("get-app-version", getAppVersion);
 
 function getHostName() {
   return pcName;
