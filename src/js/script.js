@@ -142,6 +142,13 @@ shareScreenElement.addEventListener("click", async () => {
     }
   }
 });
+function sleep(time) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(null);
+    }, time);
+  });
+}
 
 async function initServer() {
   let hostName = await window.api.getHostName();
@@ -149,10 +156,14 @@ async function initServer() {
   let appVersion = await window.api.getAppVersion();
   let servers = [appVersion, QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
   for (const network of Object.keys(networks)) {
+    console.log(network);
     let address = networks[network][0];
     let url = "http://" + address + ":" + PORT + "/";
 
-    let result = await fetch(url);
+    let result = await Promise.race([Promise.resolve(), sleep(1000)]);
+    if (!result) {
+      continue;
+    }
     let resultJson = await result.json();
     if (resultJson == SERVER_REST_RESPONSE) {
       // server returned correct response so a possible server address
