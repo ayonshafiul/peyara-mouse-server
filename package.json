@@ -1,7 +1,7 @@
 {
   "name": "peyara-server",
   "productName": "PeyaraRemoteMouseServer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Peyara Remote Mouse Server for controlling desktop mouse with android or ios devices",
   "main": "src/main.js",
   "scripts": {
