@@ -156,11 +156,9 @@ async function initServer() {
   let appVersion = await window.api.getAppVersion();
   let servers = [appVersion, QRCODE_SECRET, hostName]; // first element will be used to verify the qr code and the second one contains the host name
   for (const network of Object.keys(networks)) {
-    console.log(network);
     let address = networks[network][0];
     let url = "http://" + address + ":" + PORT + "/";
-
-    let result = await Promise.race([Promise.resolve(), sleep(1000)]);
+    let result = await Promise.race([fetch(url), sleep(1000)]);
     if (!result) {
       continue;
     }
