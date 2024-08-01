@@ -48,4 +48,4 @@ jobs:
           file: out/make/**/*${{ matrix.ext }}
           tag: ${{ github.ref }}
           overwrite: true
-          body: "Release for Peyara Mouse"
+          body: "Release for Peyara Mouse Server ${{ github.ref }}"
