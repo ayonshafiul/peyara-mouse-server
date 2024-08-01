@@ -22,7 +22,7 @@
     "electron": "^31.3.1"
   },
   "dependencies": {
-    "@jitsi/robotjs": "0.6.13",
+    "@jitsi/robotjs": "0.6.7",
     "electron-squirrel-startup": "^1.0.1",
     "express": "^4.19.2",
     "killable": "^1.0.1",
