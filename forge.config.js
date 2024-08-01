@@ -14,6 +14,7 @@ module.exports = {
         authors: "Shafiul Muslebeen",
         description: "Peyar Server",
         setupIcon: "./src/assets/icon.ico",
+        iconUrl: "https://peyara-remote-mouse.vercel.app/img/favicon.ico",
       },
     },
     {
