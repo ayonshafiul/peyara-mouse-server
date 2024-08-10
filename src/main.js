@@ -17,6 +17,8 @@ const killable = require("killable");
 const path = require("path");
 let robot = require("@jitsi/robotjs");
 const expressServer = require("express")();
+const multer = require("multer");
+const os = require("os");
 const { networkInterfaces, hostname } = require("os");
 const server = require("http").createServer(expressServer);
 const io = require("socket.io")(server);
@@ -44,8 +46,31 @@ for (const name of Object.keys(nets)) {
   }
 }
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(os.homedir(), "Downloads"));
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 expressServer.get("/", function (req, res) {
   res.json("peyara");
+});
+
+expressServer.post("/upload", upload.single("file"), (req, res) => {
+  if (req.file) {
+    res.send({
+      status: "success",
+      message: "File uploaded successfully",
+      file: req.file,
+    });
+  } else {
+    res.status(400).send({ status: "fail", message: "No file uploaded" });
+  }
 });
 
 robot.setMouseDelay(1);
