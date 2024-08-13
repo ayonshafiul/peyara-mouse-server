@@ -3,6 +3,9 @@ let textInputElement = document.querySelector("#text-input");
 let textSendElement = document.querySelector("#text-send");
 let copyElement = document.querySelector("#copy");
 let shareScreenElement = document.querySelector("#share-screen");
+let pathInputElement = document.querySelector("#path-input");
+let changePathInputElement = document.querySelector("#change-path-input");
+let showRecievedFilesElement = document.querySelector("#show-recieved-files");
 
 const PORT = 1313;
 const SERVER_REST_RESPONSE = "peyara";
@@ -150,6 +153,19 @@ function sleep(time) {
   });
 }
 
+changePathInputElement.addEventListener("click", async () => {
+  const path = await window.api.openDiretory();
+  if (path) {
+    localStorage.setItem("upload-path", path);
+    await window.api.setUploadPath(path);
+    pathInputElement.value = path;
+  }
+});
+
+showRecievedFilesElement.addEventListener("click", async () => {
+  await window.api.openUploadDirectory();
+});
+
 async function initServer() {
   let hostName = await window.api.getHostName();
   let networks = await window.api.getServerAddress();
@@ -171,6 +187,14 @@ async function initServer() {
   let qrValue = servers.join(",");
   generateQr(qrValue);
   setHostName(hostName);
+
+  let uploadPath = localStorage.getItem("upload-path");
+  if (uploadPath) {
+    await window.api.setUploadPath(uploadPath);
+  } else {
+    uploadPath = await window.api.getUploadPath();
+  }
+  pathInputElement.value = uploadPath;
 }
 
 // Start Server on app

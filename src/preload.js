@@ -18,4 +18,8 @@ contextBridge.exposeInMainWorld("api", {
   onRecieveText: (callback) =>
     ipcRenderer.on("recieve-text", (_event, value) => callback(value)),
   getScreenId: () => screenId,
+  openDiretory: () => ipcRenderer.invoke("open-directory-dialog"),
+  openUploadDirectory: () => ipcRenderer.invoke("open-upload-directory"),
+  getUploadPath: () => ipcRenderer.invoke("get-upload-path"),
+  setUploadPath: (path) => ipcRenderer.invoke("set-upload-path", path),
 });

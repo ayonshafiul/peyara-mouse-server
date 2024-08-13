@@ -30,6 +30,8 @@ const results = {};
 const PORT = 1313;
 let mainWindow;
 
+let uploadPath = path.join(os.homedir(), "Downloads");
+
 // all connected socket clients list
 let socketsList = [];
 
@@ -48,7 +50,7 @@ for (const name of Object.keys(nets)) {
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(os.homedir(), "Downloads"));
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
@@ -224,6 +226,28 @@ async function copyText(_event, text) {
 
 ipcMain.handle("copy-text", copyText);
 
+ipcMain.handle("open-directory-dialog", async (event) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openDirectory"],
+  });
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0]; // Return the selected directory path
+  }
+  return null;
+});
+
+ipcMain.handle("set-upload-path", async (event, path) => {
+  uploadPath = path;
+});
+
+ipcMain.handle("get-upload-path", async (event) => {
+  return uploadPath;
+});
+
+ipcMain.handle("open-upload-directory", async (event) => {
+  shell.openPath(uploadPath);
+});
+
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -236,7 +260,7 @@ const createWindow = () => {
       devTools: !app.isPackaged,
     },
   });
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
   mainWindow.webContents.on("will-navigate", (event, url) => {
     event.preventDefault();
     shell.openExternal(url);

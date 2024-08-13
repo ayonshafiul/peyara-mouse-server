@@ -13,26 +13,44 @@
   </head>
   <body>
     <div class="container">
-      <img
-        src="assets/icon.png"
-        alt="icon"
-        width="128"
-        height="128"
-        class="icon"
-      />
-      <canvas id="qr"></canvas>
-      <!-- <div id="toggle-server" class="d-2">Start Server</div> -->
-      <h3 id="host-name"></h3>
-      <div id="text-wrapper">
+      <div class="qr-wrapper">
+        <img
+          src="assets/icon.png"
+          alt="icon"
+          width="128"
+          height="128"
+          class="icon"
+        />
+        <canvas id="qr"></canvas>
+        <h3 id="host-name"></h3>
+      </div>
+
+      <div>
         <textarea
           type="text"
           id="text-input"
           placeholder="Type here to send text to mobile"
         ></textarea>
         <div id="copy">Copy to clipboard</div>
-        <div id="text-send" class="d-2">Send to mobile</div>
+        <div id="text-send" class="button">Send to mobile</div>
+        <div id="share-screen" class="button">Share Screen</div>
       </div>
-      <div id="share-screen" class="d-2">Share Screen</div>
+
+      <div class="input-wrapper">
+        <input
+          type="text"
+          id="path-input"
+          class="input"
+          placeholder="Change Input Path"
+          disabled
+        />
+
+        <div class="button" id="change-path-input">
+          Change Recieve Files Directory
+        </div>
+        <div class="button" id="show-recieved-files">Show Recieved Files</div>
+      </div>
+
       <div id="mobile-instructions">
         <div>
           <p>Download the client</p>
@@ -47,5 +65,5 @@
   </body>
   <script src="http://localhost:1313/socket.io/socket.io.js"></script>
   <script src="js/qrious.js"></script>
-  <script src="js/script.js"></script>
+  <script src="js/renderer.js"></script>
 </html>

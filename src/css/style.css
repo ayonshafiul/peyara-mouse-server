@@ -8,11 +8,9 @@ body {
 }
 
 .container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
   min-height: 100vh;
+  width: 400px;
+  margin: 0px auto;
   gap: 8px;
 }
 
@@ -24,34 +22,69 @@ body {
   margin-top: 16px;
 }
 
-.d-2 {
+.button {
   background-color: #ffeb3b;
   color: black;
-  padding: 16px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
   border-left: 2px solid #1f1f1f;
   border-bottom: 2px solid #1f1f1f;
+  text-align: center;
+  margin-bottom: 8px;
 }
-.d-2:hover {
+.button:hover {
   background-color: #1f1f1f;
   color: #ffeb3b;
-  border: 2px solid #ffeb3b;
 }
 
 #host-name {
-  margin: 16;
+  margin: 16px;
+}
+
+.input-wrapper {
+  width: 400px;
+
+  margin: 0px auto;
 }
 
 #text-input {
-  width: 500px;
-  height: 200px;
+  width: 400px;
+  height: 100px;
   text-align: top;
   margin-bottom: 8px;
+  box-sizing: border-box;
+  border: 1px solid grey;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+#path-input {
+  width: 400px;
+  height: 30px;
+  font-family: monospace;
+  margin: 8px 0px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid gray;
+  border-radius: 8px;
 }
 
 #copy {
   text-align: right;
   cursor: pointer;
   margin-bottom: 8px;
+}
+
+.qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+#qr {
+  display: block;
+  text-align: center;
 }
