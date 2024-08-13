@@ -260,7 +260,7 @@ const createWindow = () => {
       devTools: !app.isPackaged,
     },
   });
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
   mainWindow.webContents.on("will-navigate", (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
