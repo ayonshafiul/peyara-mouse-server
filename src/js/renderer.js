@@ -1,7 +1,9 @@
 let hostElement = document.querySelector("#host-name");
+let versionTextElement = document.querySelector("#version-text");
 let textInputElement = document.querySelector("#text-input");
 let textSendElement = document.querySelector("#text-send");
 let copyElement = document.querySelector("#copy");
+let copyTextElement = document.querySelector("#copy-text");
 let shareScreenElement = document.querySelector("#share-screen");
 let pathInputElement = document.querySelector("#path-input");
 let changePathInputElement = document.querySelector("#change-path-input");
@@ -36,9 +38,9 @@ textSendElement.addEventListener("click", async () => {
 
 copyElement.addEventListener("click", async () => {
   await window.api.copyText(textInputElement.value);
-  copyElement.innerHTML = "Copied!";
+  copyTextElement.innerHTML = "Copied to clipboard!";
   setTimeout(() => {
-    copyElement.innerHTML = "Copy to clipboard";
+    copyTextElement.innerHTML = "Send text to phone";
   }, 1000);
 });
 
@@ -187,6 +189,7 @@ async function initServer() {
   let qrValue = servers.join(",");
   generateQr(qrValue);
   setHostName(hostName);
+  versionTextElement.innerHTML = "v" + appVersion;
 
   let uploadPath = localStorage.getItem("upload-path");
   if (uploadPath) {

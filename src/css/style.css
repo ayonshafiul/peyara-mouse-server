@@ -33,6 +33,22 @@ body {
   text-align: center;
   margin-bottom: 8px;
 }
+
+.icon-button {
+  background-color: #ffeb3b;
+  color: black;
+  padding: 4px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background-color: black;
+  color: #ffeb3b;
+}
 .button:hover {
   background-color: #1f1f1f;
   color: #ffeb3b;
@@ -42,14 +58,20 @@ body {
   margin: 16px;
 }
 
-.input-wrapper {
-  width: 400px;
+.icon-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
 
+.input-wrapper {
+  width: 320px;
   margin: 0px auto;
 }
 
 #text-input {
-  width: 400px;
+  width: 340px;
   height: 100px;
   text-align: top;
   margin-bottom: 8px;
@@ -60,7 +82,7 @@ body {
 }
 
 #path-input {
-  width: 400px;
+  width: 340px;
   height: 30px;
   font-family: monospace;
   margin: 8px 0px;
@@ -70,18 +92,14 @@ body {
   border-radius: 8px;
 }
 
-#copy {
-  text-align: right;
-  cursor: pointer;
-  margin-bottom: 8px;
+#version-text {
+  margin: 8px 0px;
 }
-
 .qr-wrapper {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 16px;
 }
 
 #qr {
